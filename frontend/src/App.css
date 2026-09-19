@@ -141,3 +141,9 @@ header p {
   color: white;
   background-color: #a94b4b;
 }
+.error-message {
+  padding: 10px;
+  color: #ffb4b4;
+  background-color: #3b2020;
+  border-radius: 5px;
+}

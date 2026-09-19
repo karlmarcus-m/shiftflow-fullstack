@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
 
@@ -6,10 +6,12 @@ type Shift = {
   id: number
   title: string
   date: string
-  startTime: string
-  endTime: string
+  start_time: string
+  end_time: string
   notes: string
 }
+
+const API_URL = 'http://127.0.0.1:8000'
 
 function App() {
   const [title, setTitle] = useState('')
@@ -18,36 +20,88 @@ function App() {
   const [endTime, setEndTime] = useState('')
   const [notes, setNotes] = useState('')
   const [shifts, setShifts] = useState<Shift[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    async function loadShifts() {
+      try {
+        const response = await fetch(`${API_URL}/api/shifts`)
+
+        if (!response.ok) {
+          throw new Error('Could not load shifts')
+        }
+
+        const data: Shift[] = await response.json()
+        setShifts(data)
+      } catch {
+        setError('Could not connect to the backend.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadShifts()
+  }, [])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setError('')
 
     if (endTime <= startTime) {
-      alert('End time must be after start time.')
+      setError('End time must be after start time.')
       return
     }
 
-    const newShift: Shift = {
-      id: Date.now(),
-      title: title,
-      date: date,
-      startTime: startTime,
-      endTime: endTime,
-      notes: notes,
+    try {
+      const response = await fetch(`${API_URL}/api/shifts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title,
+          date: date,
+          start_time: startTime,
+          end_time: endTime,
+          notes: notes,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Could not create shift')
+      }
+
+      const newShift: Shift = await response.json()
+      setShifts([...shifts, newShift])
+
+      setTitle('')
+      setDate('')
+      setStartTime('')
+      setEndTime('')
+      setNotes('')
+    } catch {
+      setError('Could not create the shift.')
     }
-
-    setShifts([...shifts, newShift])
-
-    setTitle('')
-    setDate('')
-    setStartTime('')
-    setEndTime('')
-    setNotes('')
   }
 
-  function deleteShift(id: number) {
-    const updatedShifts = shifts.filter((shift) => shift.id !== id)
-    setShifts(updatedShifts)
+  async function deleteShift(id: number) {
+    setError('')
+
+    try {
+      const response = await fetch(`${API_URL}/api/shifts/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Could not delete shift')
+      }
+
+      const updatedShifts = shifts.filter((shift) => shift.id !== id)
+      setShifts(updatedShifts)
+    } catch {
+      setError('Could not delete the shift.')
+    }
   }
 
   return (
@@ -119,7 +173,11 @@ function App() {
         <section className="card">
           <h2>Upcoming shifts</h2>
 
-          {shifts.length === 0 ? (
+          {error && <p className="error-message">{error}</p>}
+
+          {loading ? (
+            <p>Loading shifts...</p>
+          ) : shifts.length === 0 ? (
             <p>No shifts added yet.</p>
           ) : (
             <div className="shift-list">
@@ -140,7 +198,7 @@ function App() {
                   <p>{shift.date}</p>
 
                   <p className="shift-time">
-                    {shift.startTime}–{shift.endTime}
+                    {shift.start_time}–{shift.end_time}
                   </p>
 
                   {shift.notes && (
