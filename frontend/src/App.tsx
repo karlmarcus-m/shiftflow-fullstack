@@ -1,5 +1,50 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import './App.css'
+
+type Shift = {
+  id: number
+  title: string
+  date: string
+  startTime: string
+  endTime: string
+  notes: string
+}
+
 function App() {
+  const [title, setTitle] = useState('')
+  const [date, setDate] = useState('')
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
+  const [notes, setNotes] = useState('')
+  const [shifts, setShifts] = useState<Shift[]>([])
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (endTime <= startTime) {
+      alert('End time must be after start time.')
+      return
+    }
+
+    const newShift: Shift = {
+      id: Date.now(),
+      title: title,
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      notes: notes,
+    }
+
+    setShifts([...shifts, newShift])
+
+    setTitle('')
+    setDate('')
+    setStartTime('')
+    setEndTime('')
+    setNotes('')
+  }
+
   return (
     <main className="app">
       <header>
@@ -11,24 +56,35 @@ function App() {
         <section className="card">
           <h2>Add a shift</h2>
 
-          <form className="shift-form">
+          <form className="shift-form" onSubmit={handleSubmit}>
             <label htmlFor="title">Shift title</label>
             <input
               id="title"
               name="title"
               type="text"
               placeholder="Morning shift"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
               required
             />
 
             <label htmlFor="date">Date</label>
-            <input id="date" name="date" type="date" required />
+            <input
+              id="date"
+              name="date"
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+              required
+            />
 
             <label htmlFor="start-time">Start time</label>
             <input
               id="start-time"
               name="start-time"
               type="time"
+              value={startTime}
+              onChange={(event) => setStartTime(event.target.value)}
               required
             />
 
@@ -37,6 +93,8 @@ function App() {
               id="end-time"
               name="end-time"
               type="time"
+              value={endTime}
+              onChange={(event) => setEndTime(event.target.value)}
               required
             />
 
@@ -45,15 +103,33 @@ function App() {
               id="notes"
               name="notes"
               placeholder="Optional details"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
             />
 
-            <button type="button">Add shift</button>
+            <button type="submit">Add shift</button>
           </form>
         </section>
 
         <section className="card">
           <h2>Upcoming shifts</h2>
-          <p>No shifts added yet.</p>
+
+          {shifts.length === 0 ? (
+            <p>No shifts added yet.</p>
+          ) : (
+            <div className="shift-list">
+              {shifts.map((shift) => (
+                <article className="shift-item" key={shift.id}>
+                  <h3>{shift.title}</h3>
+                  <p>{shift.date}</p>
+                  <p>
+                    {shift.startTime}–{shift.endTime}
+                  </p>
+                  {shift.notes && <p>{shift.notes}</p>}
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </main>
