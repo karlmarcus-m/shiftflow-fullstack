@@ -90,4 +90,54 @@ header p {
   header h1 {
     font-size: 38px;
   }
+} 
+.shift-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shift-item {
+  padding: 14px;
+  background-color: #2a2a31;
+  border: 1px solid #444;
+  border-radius: 6px;
+}
+
+.shift-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.shift-header h3 {
+  margin: 0;
+}
+
+.shift-item p {
+  margin: 6px 0;
+  color: #c7c7c7;
+}
+
+.shift-time {
+  font-weight: bold;
+}
+
+.shift-notes {
+  font-size: 14px;
+}
+
+.delete-button {
+  padding: 6px 10px;
+  color: #ffb4b4;
+  background-color: transparent;
+  border: 1px solid #a94b4b;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  color: white;
+  background-color: #a94b4b;
 }

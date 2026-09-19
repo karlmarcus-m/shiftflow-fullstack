@@ -45,6 +45,11 @@ function App() {
     setNotes('')
   }
 
+  function deleteShift(id: number) {
+    const updatedShifts = shifts.filter((shift) => shift.id !== id)
+    setShifts(updatedShifts)
+  }
+
   return (
     <main className="app">
       <header>
@@ -120,12 +125,27 @@ function App() {
             <div className="shift-list">
               {shifts.map((shift) => (
                 <article className="shift-item" key={shift.id}>
-                  <h3>{shift.title}</h3>
+                  <div className="shift-header">
+                    <h3>{shift.title}</h3>
+
+                    <button
+                      className="delete-button"
+                      type="button"
+                      onClick={() => deleteShift(shift.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+
                   <p>{shift.date}</p>
-                  <p>
+
+                  <p className="shift-time">
                     {shift.startTime}–{shift.endTime}
                   </p>
-                  {shift.notes && <p>{shift.notes}</p>}
+
+                  {shift.notes && (
+                    <p className="shift-notes">{shift.notes}</p>
+                  )}
                 </article>
               ))}
             </div>
