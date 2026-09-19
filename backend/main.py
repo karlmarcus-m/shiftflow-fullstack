@@ -54,3 +54,19 @@ def create_shift(shift_data: ShiftCreate):
     shifts.append(new_shift)
 
     return new_shift
+
+
+@app.delete(
+    "/api/shifts/{shift_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_shift(shift_id: int):
+    for shift in shifts:
+        if shift.id == shift_id:
+            shifts.remove(shift)
+            return
+
+    raise HTTPException(
+        status_code=404,
+        detail="Shift not found",
+    )
