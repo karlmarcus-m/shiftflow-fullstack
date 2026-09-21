@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
 
-const API_URL = 'http://127.0.0.1:8000'
+const API_URL = ''
 
 type Shift = {
   id: number
@@ -276,7 +276,7 @@ function App() {
 
                   <p>{shift.date}</p>
                   <p className="shift-time">
-                    {formatTime(shift.start_time)}–
+                    {formatTime(shift.start_time)} - 
                     {formatTime(shift.end_time)}
                   </p>
 
@@ -294,3 +294,6 @@ function App() {
 }
 
 export default App
+
+
+
