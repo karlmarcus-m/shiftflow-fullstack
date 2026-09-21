@@ -88,6 +88,38 @@ def create_shift(
     return new_shift
 
 
+@app.put("/api/shifts/{shift_id}", response_model=Shift)
+def update_shift(
+    shift_id: int,
+    updated_shift: ShiftCreate,
+    database: Session = Depends(get_db),
+):
+    if updated_shift.end_time <= updated_shift.start_time:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="End time must be after start time",
+        )
+
+    shift = database.get(ShiftModel, shift_id)
+
+    if shift is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Shift not found",
+        )
+
+    shift.title = updated_shift.title
+    shift.date = updated_shift.date
+    shift.start_time = updated_shift.start_time
+    shift.end_time = updated_shift.end_time
+    shift.notes = updated_shift.notes
+
+    database.commit()
+    database.refresh(shift)
+
+    return shift
+
+
 @app.delete(
     "/api/shifts/{shift_id}",
     status_code=status.HTTP_204_NO_CONTENT,
